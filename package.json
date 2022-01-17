@@ -8,6 +8,7 @@
     "build": "tsc -p ."
   },
   "devDependencies": {
+    "@types/cors": "^2.8.12",
     "@types/express": "^4.17.13",
     "@types/node": "^16.4.2",
     "@types/uuid": "^8.3.4",
@@ -16,6 +17,7 @@
   },
   "dependencies": {
     "@geckos.io/server": "^2.1.6",
+    "cors": "^2.8.5",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
     "uuid": "^8.3.2"
