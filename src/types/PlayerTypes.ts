@@ -9,6 +9,7 @@ export enum PlayerGeckosEvents {
 
 export interface PlayerCreationPayload {
   id: string;
+  name: string;
   x: number;
   y: number;
   channelId: string;
@@ -20,7 +21,8 @@ export interface PlayerLogoutPayload {
 
 export interface IConnectedPlayer {
   id: string;
+  name: string;
   x: number;
   y: number;
-  roomId: string;
+  channelId: string;
 }
