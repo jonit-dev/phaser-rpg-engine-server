@@ -19,10 +19,18 @@ export interface PlayerLogoutPayload {
   id: string;
 }
 
+export interface PlayerPositionPayload {
+  id: string;
+  x: number;
+  y: number;
+  direction: string;
+}
+
 export interface IConnectedPlayer {
   id: string;
   name: string;
   x: number;
   y: number;
   channelId: string;
+  direction?: string;
 }

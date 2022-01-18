@@ -5,6 +5,7 @@ import {
   PlayerCreationPayload,
   PlayerGeckosEvents,
   PlayerLogoutPayload,
+  PlayerPositionPayload,
 } from "../../types/PlayerTypes";
 import { GeckosServerHelper } from "../GeckosServerHelper";
 import { GeckosMessagingHelper } from "./GeckosMessagingHelper";
@@ -16,6 +17,7 @@ export class GeckosPlayerHelper {
   public bind(channel: ServerChannel) {
     this.onPlayerCreate(channel);
     this.onPlayerLogout(channel);
+    this.onPlayerUpdatePosition(channel);
   }
 
   public onPlayerCreate(channel: ServerChannel) {
@@ -23,6 +25,7 @@ export class GeckosPlayerHelper {
       const data = d as PlayerCreationPayload;
 
       console.log(`💡: Player ${data.name} has connected!`);
+      console.log(data);
       GeckosServerHelper.connectedPlayers.push({
         id: data.id,
         name: data.name,
@@ -30,29 +33,20 @@ export class GeckosPlayerHelper {
         y: data.y,
         channelId: data.channelId,
       });
+
+      channel.join(data.channelId); // join channel specific to the user, to we can send direct messages later if we want.
+
+      // channel.join(data.channelId);
       console.log(
         "- Total players connected:",
         GeckosServerHelper.connectedPlayers.length
       );
 
-      const firstPlayer = GeckosServerHelper.connectedPlayers[0];
-
-      this.geckosMessagingHelper.sendPrivateEvent(
-        channel,
-        firstPlayer.channelId,
-        PlayerGeckosEvents.PrivateMessage,
-        {
-          message: `YOURE ARE THE FIRST PLAYER - ${firstPlayer.name}`,
-        }
+      this.geckosMessagingHelper.sendMessageToClosePlayers(
+        data.id,
+        PlayerGeckosEvents.Create,
+        data
       );
-
-      // broadcast to other players that a new player has joined
-      // this.sendMessageToClosePlayers(
-      //   channel,
-      //   data.id,
-      //   PlayerGeckosEvents.Create,
-      //   data
-      // );
     });
   }
 
@@ -69,6 +63,28 @@ export class GeckosPlayerHelper {
         `- Total players connected:`,
         GeckosServerHelper.connectedPlayers.length
       );
+    });
+  }
+
+  public onPlayerUpdatePosition(channel: ServerChannel) {
+    channel.on(PlayerGeckosEvents.PositionUpdate, (d: Data) => {
+      const data = d as PlayerPositionPayload;
+
+      // update player position from connectedPlayers
+      GeckosServerHelper.connectedPlayers.map((player) => {
+        if (player.id === data.id) {
+          player.x = data.x;
+          player.y = data.y;
+          player.direction = data.direction;
+
+          this.geckosMessagingHelper.sendMessageToClosePlayers(
+            data.id,
+            PlayerGeckosEvents.PositionUpdate,
+            data
+          );
+        }
+        return player;
+      });
     });
   }
 }
