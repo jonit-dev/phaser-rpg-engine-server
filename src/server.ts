@@ -21,4 +21,19 @@ const server = app.listen(port, () => {
 
   const geckosServer = new GeckosServerHelper();
   geckosServer.init(server);
+
+  // const mapData = JSON.parse(
+  //   fs.readFileSync(
+  //     path.resolve(__dirname, "../public/maps/desert.json"),
+  //     "utf8"
+  //   )
+  // );
+  // const layer0Data = mapData.layers[0].data;
+
+  // const tilemapParser = new TilemapParser();
+
+  // const { x, y } = tilemapParser.getTileXY(104);
+  // const tileId = tilemapParser.getTileId(x, y, layer0Data);
+
+  // console.log(tileId);
 });

@@ -1,12 +1,15 @@
 import { Server } from "http";
-import {
-  PlayerCreationPayload,
-  PlayerGeckosEvents,
-  PlayerLogoutPayload,
-} from "../types/PlayerTypes";
+import { IConnectedPlayer } from "../types/PlayerTypes";
+import { GeckosPlayerHelper } from "./Geckos/GeckosPlayerHelper";
 
 export class GeckosServerHelper {
-  public connectedPlayerIds: string[] = [];
+  private geckosPlayerHelper: GeckosPlayerHelper;
+
+  constructor() {
+    this.geckosPlayerHelper = new GeckosPlayerHelper();
+  }
+
+  public static connectedPlayers: IConnectedPlayer[] = [];
 
   public async init(httpServer: Server) {
     // import geckos as ESM
@@ -17,40 +20,7 @@ export class GeckosServerHelper {
     io.addServer(httpServer);
 
     io.onConnection((channel) => {
-      // channel.on("chat message", (data) => {
-      //   console.log("new incoming message!");
-      //   console.log(data);
-      //   // emit the "chat message" data to all channels in the same room
-      //   io.room(channel.roomId).emit("chat message", data);
-      // });
-      channel.on(PlayerGeckosEvents.Create, (d) => {
-        const data = d as PlayerCreationPayload;
-
-        console.log(PlayerGeckosEvents.Create);
-        console.log(`💡: Player ${data.id} has connected!`);
-        this.connectedPlayerIds.push(data.id);
-        console.log(
-          "- Total players connected:",
-          this.connectedPlayerIds.length
-        );
-
-        // broadcast to other players that a new player has joined
-        channel.broadcast.emit(PlayerGeckosEvents.Create, data);
-      });
-
-      channel.on(PlayerGeckosEvents.Logout, (d) => {
-        const data = d as PlayerLogoutPayload;
-
-        this.connectedPlayerIds = this.connectedPlayerIds.filter(
-          (id) => id !== data.id
-        );
-
-        console.log(`🚪: Player id ${data.id} has disconnected`);
-        console.log(
-          `- Total players connected:`,
-          this.connectedPlayerIds.length
-        );
-      });
+      this.geckosPlayerHelper.bind(channel);
     });
   }
 }
