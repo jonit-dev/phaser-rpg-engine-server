@@ -1,3 +1,5 @@
+import { provide } from "inversify-binding-decorators";
+@provide(MathHelper)
 export class MathHelper {
   public getDistanceBetweenPoints(
     x1: number,

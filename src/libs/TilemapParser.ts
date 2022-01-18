@@ -1,8 +1,11 @@
+import { provide } from "inversify-binding-decorators";
+
 interface IGetTileXYResult {
   x: number;
   y: number;
 }
 
+@provide(TilemapParser)
 export class TilemapParser {
   private tileWidth = 32;
   private tileHeight = 32;

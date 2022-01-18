@@ -1,5 +1,8 @@
 import cors from "cors";
 import express from "express";
+import { Container } from "inversify";
+import { buildProviderModule } from "inversify-binding-decorators";
+import "reflect-metadata";
 import { GeckosServerHelper } from "./libs/GeckosServerHelper";
 import { serverRouter } from "./resources/server/server.routes";
 
@@ -19,7 +22,10 @@ app.use(express.static("public"));
 const server = app.listen(port, () => {
   console.log(`⚙️ Server running on port ${port}`);
 
-  const geckosServer = new GeckosServerHelper();
+  const container = new Container();
+  container.load(buildProviderModule());
+
+  const geckosServer = container.get<GeckosServerHelper>(GeckosServerHelper);
   geckosServer.init(server);
 
   // const mapData = JSON.parse(
