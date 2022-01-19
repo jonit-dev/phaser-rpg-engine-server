@@ -28,7 +28,3 @@ export interface ICameraCoordinates {
   width: number;
   height: number;
 }
-
-export interface IPlayersView {
-  [playerId: string]: IConnectedPlayer;
-}
