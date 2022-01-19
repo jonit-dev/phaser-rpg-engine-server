@@ -14,7 +14,7 @@ import { GeckosMessagingHelper } from "./GeckosMessagingHelper";
 export class GeckosPlayerHelper {
   constructor(private geckosMessagingHelper: GeckosMessagingHelper) {}
 
-  public bind(channel: ServerChannel) {
+  public onAddEventListeners(channel: ServerChannel) {
     this.onPlayerCreate(channel);
     this.onPlayerLogout(channel);
     this.onPlayerUpdatePosition(channel);
@@ -42,11 +42,7 @@ export class GeckosPlayerHelper {
         GeckosServerHelper.connectedPlayers.length
       );
 
-      this.geckosMessagingHelper.sendMessageToClosePlayers(
-        data.id,
-        PlayerGeckosEvents.Create,
-        data
-      );
+      this.sendCreationMessageToPlayers(data.channelId, data.id, data);
     });
   }
 
@@ -86,5 +82,43 @@ export class GeckosPlayerHelper {
         return player;
       });
     });
+  }
+
+  public sendCreationMessageToPlayers(
+    emitterChannelId: string,
+    emitterId: string,
+    data: PlayerCreationPayload
+  ) {
+    const nearbyPlayers =
+      this.geckosMessagingHelper.getPlayersNearby(emitterId);
+
+    if (nearbyPlayers.length > 0) {
+      for (const player of nearbyPlayers) {
+        console.log(
+          `Warning player **${player.name}** about **${data.name}** creation`
+        );
+
+        // tell other player that we exist, so it can create a new instance of us
+        this.geckosMessagingHelper.sendEventToUser(
+          player.channelId,
+          PlayerGeckosEvents.Create,
+          data
+        );
+
+        // tell the emitter player that this other player exist too :)
+
+        this.geckosMessagingHelper.sendEventToUser(
+          emitterChannelId,
+          PlayerGeckosEvents.Create,
+          {
+            ...player,
+          } as PlayerCreationPayload
+        );
+
+        console.log(
+          `Warning player **${data.name}** about **${player.name}** creation`
+        );
+      }
+    }
   }
 }

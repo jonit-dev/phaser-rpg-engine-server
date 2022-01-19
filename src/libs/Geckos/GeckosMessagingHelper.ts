@@ -1,5 +1,6 @@
 //@ts-ignore
 import { provide } from "inversify-binding-decorators";
+import { IConnectedPlayer } from "../../types/PlayerTypes";
 import { GeckosServerHelper } from "../GeckosServerHelper";
 import { MathHelper } from "../MathHelper";
 
@@ -20,20 +21,34 @@ export class GeckosMessagingHelper {
     eventName: string,
     data: any
   ) {
+    const playersNearby = this.getPlayersNearby(emitterId);
+
+    console.log("warning close players");
+    console.log(playersNearby);
+
+    if (playersNearby) {
+      for (const player of playersNearby) {
+        this.sendEventToUser(player.channelId, eventName, data);
+      }
+    }
+  }
+
+  public getPlayersNearby(emitterId: string): IConnectedPlayer[] {
     const players = GeckosServerHelper.connectedPlayers;
 
     const emitterPlayer = players.find((player) => player.id === emitterId);
 
     if (!emitterPlayer) {
       console.log("Error: emitter player not found to calculate distance");
-      return;
+      return [];
     }
+
+    const playersUnderRange: IConnectedPlayer[] = [];
 
     for (const player of players) {
       if (player.id === emitterPlayer.id) {
         continue; // avoid sending to self
       }
-      console.log(`Checking ${player.name}...`);
 
       if (
         this.isUnderPlayerRange(
@@ -43,19 +58,11 @@ export class GeckosMessagingHelper {
           player.y
         )
       ) {
-        console.log(
-          `Emitter ${emitterPlayer.name} SENDING EVENT(${eventName}) to player ${player.name} that's on channel ${player.channelId}`
-        );
-
-        // want near user about our emitter
-        this.sendEventToUser(player.channelId, eventName, data);
-
-        // and warn our emitter as well!
-        this.sendEventToUser(emitterPlayer.channelId, eventName, {
-          ...player,
-        });
+        playersUnderRange.push(player);
       }
     }
+
+    return playersUnderRange;
   }
 
   private isUnderPlayerRange(

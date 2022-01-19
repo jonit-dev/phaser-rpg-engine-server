@@ -20,8 +20,7 @@ export class GeckosServerHelper {
     GeckosServerHelper.io.listen(3000);
     GeckosServerHelper.io.addServer(httpServer);
     GeckosServerHelper.io.onConnection((channel) => {
-      // bind events
-      this.geckosPlayerHelper.bind(channel);
+      this.geckosPlayerHelper.onAddEventListeners(channel);
     });
   }
 }
