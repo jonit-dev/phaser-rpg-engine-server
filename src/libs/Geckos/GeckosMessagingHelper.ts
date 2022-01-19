@@ -1,10 +1,9 @@
 //@ts-ignore
 import { provide } from "inversify-binding-decorators";
 import {
-  CAMERA_VIEWPORT_WIDTH,
-  GRID_WIDTH,
+  CAMERA_VIEWPORT_WIDTH, GRID_WIDTH
 } from "../../constants/worldConstants";
-import { ICameraCoordinates, IConnectedPlayer } from "../../types/PlayerTypes";
+import { IConnectedPlayer } from "../../types/PlayerTypes";
 import { GeckosServerHelper } from "../GeckosServerHelper";
 import { MathHelper } from "../MathHelper";
 
@@ -55,13 +54,30 @@ export class GeckosMessagingHelper {
 
       if (
         this.isUnderPlayerCamera(
-          emitterPlayer.x * 32, // we have to multiply because emitter x,y is on grid format
+          player.x * 32, // we have to multiply because emitter x,y is on grid format
+          player.y * 32,
+          emitterPlayer.cameraCoordinates
+        ) ||
+        this.isUnderPlayerCamera(
+          emitterPlayer.x * 32,
           emitterPlayer.y * 32,
           player.cameraCoordinates
         )
       ) {
         playersUnderRange.push(player);
       }
+    }
+
+    //! Debug code
+    // if (playersUnderRange.length > 0) {
+    //   console.log(
+    //     `Players under range of ${emitterPlayer.name}: ${playersUnderRange.map(
+    //       (player) =>
+    //         `${player.name} | X: ${player.x * GRID_WIDTH} | Y: ${
+    //           player.y * GRID_HEIGHT
+    //         }`
+    //     )}`
+    //   );
     }
 
     return playersUnderRange;

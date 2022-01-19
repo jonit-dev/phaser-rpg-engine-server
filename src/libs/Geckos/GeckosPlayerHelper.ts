@@ -95,9 +95,7 @@ export class GeckosPlayerHelper {
     channel.on(PlayerGeckosEvents.PositionUpdate, (d: Data) => {
       const data = d as PlayerPositionPayload;
 
-      console.log(JSON.stringify(data));
-
-      // update player position from connectedPlayers
+      // update emitter position from connectedPlayers
       GeckosServerHelper.connectedPlayers =
         GeckosServerHelper.connectedPlayers.map((player) => {
           if (player.id === data.id) {
@@ -117,6 +115,9 @@ export class GeckosPlayerHelper {
               }
             }
             player.direction = data.direction;
+            player.cameraCoordinates = data.cameraCoordinates;
+
+            console.log(JSON.stringify(data));
 
             this.geckosMessagingHelper.sendMessageToClosePlayers(
               data.id,
