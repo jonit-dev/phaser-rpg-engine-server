@@ -1,10 +1,16 @@
 //@ts-ignore
-
 export enum PlayerGeckosEvents {
   Create = "Create",
   PositionUpdate = "PositionUpdate",
+  CoordinateSync = "CoordinateSync",
   Logout = "Logout",
   PrivateMessage = "PrivateMessage",
+}
+
+export interface PlayerCoordinatesSync {
+  id: string;
+  x: number;
+  y: number;
 }
 
 export interface PlayerCreationPayload {
@@ -25,6 +31,7 @@ export interface PlayerPositionPayload {
   y: number;
   direction: string;
   name: string;
+  channelId: string;
 }
 
 export interface IConnectedPlayer {

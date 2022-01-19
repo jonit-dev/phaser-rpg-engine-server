@@ -1,5 +1,9 @@
 //@ts-ignore
 import { provide } from "inversify-binding-decorators";
+import {
+  CAMERA_VIEWPORT_WIDTH,
+  GRID_WIDTH,
+} from "../../constants/worldConstants";
 import { IConnectedPlayer } from "../../types/PlayerTypes";
 import { GeckosServerHelper } from "../GeckosServerHelper";
 import { MathHelper } from "../MathHelper";
@@ -76,7 +80,9 @@ export class GeckosMessagingHelper {
       otherY
     );
 
-    const distanceThreshold = Math.floor(800);
+    const distanceThreshold = Math.floor(CAMERA_VIEWPORT_WIDTH / GRID_WIDTH);
+
+    // calculate distance in tiles
 
     if (distance < distanceThreshold) {
       return true;

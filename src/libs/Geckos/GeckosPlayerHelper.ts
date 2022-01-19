@@ -2,7 +2,7 @@
 import { Data, ServerChannel } from "@geckos.io/server";
 import { provide } from "inversify-binding-decorators";
 import {
-  PlayerCreationPayload,
+  PlayerCoordinatesSync,
   PlayerGeckosEvents,
   PlayerLogoutPayload,
   PlayerPositionPayload,
@@ -18,11 +18,27 @@ export class GeckosPlayerHelper {
     this.onPlayerCreate(channel);
     this.onPlayerLogout(channel);
     this.onPlayerUpdatePosition(channel);
+    this.onPlayerCoordinateSync(channel);
+  }
+
+  public onPlayerCoordinateSync(channel: ServerChannel) {
+    channel.on(PlayerGeckosEvents.CoordinateSync, (d: Data) => {
+      const data = d as PlayerCoordinatesSync;
+
+      GeckosServerHelper.connectedPlayers =
+        GeckosServerHelper.connectedPlayers.map((player) => {
+          if (player.id === data.id) {
+            player.x = data.x;
+            player.y = data.y;
+          }
+          return player;
+        });
+    });
   }
 
   public onPlayerCreate(channel: ServerChannel) {
     channel.on(PlayerGeckosEvents.Create, (d: Data) => {
-      const data = d as PlayerCreationPayload;
+      const data = d as PlayerPositionPayload;
 
       console.log(`💡: Player ${data.name} has connected!`);
       console.log(data);
@@ -91,38 +107,63 @@ export class GeckosPlayerHelper {
     channel.on(PlayerGeckosEvents.PositionUpdate, (d: Data) => {
       const data = d as PlayerPositionPayload;
 
-      // update player position from connectedPlayers
-      GeckosServerHelper.connectedPlayers.map((player) => {
-        if (player.id === data.id) {
-          player.x = data.x;
-          player.y = data.y;
-          player.direction = data.direction;
+      console.log(data);
 
-          this.geckosMessagingHelper.sendMessageToClosePlayers(
-            data.id,
+      // update player position from connectedPlayers
+      GeckosServerHelper.connectedPlayers =
+        GeckosServerHelper.connectedPlayers.map((player) => {
+          if (player.id === data.id) {
+            player.x = data.x;
+            player.y = data.y;
+            player.direction = data.direction;
+
+            this.geckosMessagingHelper.sendMessageToClosePlayers(
+              data.id,
+              PlayerGeckosEvents.PositionUpdate,
+              data
+            );
+          }
+          return player;
+        });
+
+      // update the emitter nearby players positions
+
+      const nearbyPlayers = this.geckosMessagingHelper.getPlayersNearby(
+        data.id
+      );
+
+      console.log("nearby", nearbyPlayers);
+
+      if (nearbyPlayers) {
+        for (const player of nearbyPlayers) {
+          this.geckosMessagingHelper.sendEventToUser(
+            data.channelId,
             PlayerGeckosEvents.PositionUpdate,
-            data
+            {
+              id: player.id,
+              channelId: player.channelId,
+              x: player.x,
+              y: player.y,
+              direction: player.direction,
+              name: player.name,
+              isMoving: false,
+            } as PlayerPositionPayload
           );
         }
-        return player;
-      });
+      }
     });
   }
 
   public sendCreationMessageToPlayers(
     emitterChannelId: string,
     emitterId: string,
-    data: PlayerCreationPayload
+    data: PlayerPositionPayload
   ) {
     const nearbyPlayers =
       this.geckosMessagingHelper.getPlayersNearby(emitterId);
 
     if (nearbyPlayers.length > 0) {
       for (const player of nearbyPlayers) {
-        console.log(
-          `Warning player **${player.name}** about **${data.name}** creation`
-        );
-
         // tell other player that we exist, so it can create a new instance of us
         this.geckosMessagingHelper.sendEventToUser(
           player.channelId,
@@ -137,11 +178,7 @@ export class GeckosPlayerHelper {
           PlayerGeckosEvents.Create,
           {
             ...player,
-          } as PlayerCreationPayload
-        );
-
-        console.log(
-          `Warning player **${data.name}** about **${player.name}** creation`
+          } as PlayerPositionPayload
         );
       }
     }
