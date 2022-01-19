@@ -2,7 +2,6 @@
 import { Data, ServerChannel } from "@geckos.io/server";
 import { provide } from "inversify-binding-decorators";
 import {
-  PlayerCoordinatesSync,
   PlayerGeckosEvents,
   PlayerLogoutPayload,
   PlayerPositionPayload,
@@ -18,22 +17,6 @@ export class GeckosPlayerHelper {
     this.onPlayerCreate(channel);
     this.onPlayerLogout(channel);
     this.onPlayerUpdatePosition(channel);
-    this.onPlayerCoordinateSync(channel);
-  }
-
-  public onPlayerCoordinateSync(channel: ServerChannel) {
-    channel.on(PlayerGeckosEvents.CoordinateSync, (d: Data) => {
-      const data = d as PlayerCoordinatesSync;
-
-      GeckosServerHelper.connectedPlayers =
-        GeckosServerHelper.connectedPlayers.map((player) => {
-          if (player.id === data.id) {
-            player.x = data.x;
-            player.y = data.y;
-          }
-          return player;
-        });
-    });
   }
 
   public onPlayerCreate(channel: ServerChannel) {
@@ -113,8 +96,21 @@ export class GeckosPlayerHelper {
       GeckosServerHelper.connectedPlayers =
         GeckosServerHelper.connectedPlayers.map((player) => {
           if (player.id === data.id) {
-            player.x = data.x;
-            player.y = data.y;
+            // we have this adjustments because the client sends the initial x, y, not the actual final x, y after the player stops on the grid
+            if (player.id === data.id) {
+              if (data.direction === "up") {
+                player.y = data.y - 1;
+              }
+              if (data.direction === "down") {
+                player.y = data.y + 1;
+              }
+              if (data.direction === "left") {
+                player.x = data.x - 1;
+              }
+              if (data.direction === "right") {
+                player.x = data.x + 1;
+              }
+            }
             player.direction = data.direction;
 
             this.geckosMessagingHelper.sendMessageToClosePlayers(
