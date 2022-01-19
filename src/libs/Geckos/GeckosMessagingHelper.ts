@@ -1,9 +1,10 @@
 //@ts-ignore
 import { provide } from "inversify-binding-decorators";
 import {
-  CAMERA_VIEWPORT_WIDTH, GRID_WIDTH
+  CAMERA_VIEWPORT_WIDTH,
+  GRID_WIDTH,
 } from "../../constants/worldConstants";
-import { IConnectedPlayer } from "../../types/PlayerTypes";
+import { ICameraCoordinates, IConnectedPlayer } from "../../types/PlayerTypes";
 import { GeckosServerHelper } from "../GeckosServerHelper";
 import { MathHelper } from "../MathHelper";
 
@@ -78,7 +79,7 @@ export class GeckosMessagingHelper {
     //         }`
     //     )}`
     //   );
-    }
+    // }
 
     return playersUnderRange;
   }
