@@ -17,7 +17,9 @@ export class GeckosMessagingHelper {
   }
 
   public sendEventToAllUsers(eventName: string, data: any) {
-    GeckosServerHelper.io.emit(eventName, data);
+    GeckosServerHelper.io.emit(eventName, data, {
+      reliable: true,
+    });
   }
 
   public sendMessageToClosePlayers(

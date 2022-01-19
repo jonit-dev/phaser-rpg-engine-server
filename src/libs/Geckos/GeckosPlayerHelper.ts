@@ -2,6 +2,7 @@
 import { Data, ServerChannel } from "@geckos.io/server";
 import { provide } from "inversify-binding-decorators";
 import {
+  IPlayersView,
   PlayerGeckosEvents,
   PlayerLogoutPayload,
   PlayerPositionPayload,
@@ -12,6 +13,8 @@ import { GeckosMessagingHelper } from "./GeckosMessagingHelper";
 @provide(GeckosPlayerHelper)
 export class GeckosPlayerHelper {
   constructor(private geckosMessagingHelper: GeckosMessagingHelper) {}
+
+  public playersView: IPlayersView = {};
 
   public onAddEventListeners(channel: ServerChannel) {
     this.onPlayerCreate(channel);

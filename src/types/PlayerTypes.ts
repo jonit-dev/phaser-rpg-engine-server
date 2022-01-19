@@ -36,3 +36,7 @@ export interface IConnectedPlayer {
   channelId: string;
   direction?: string;
 }
+
+export interface IPlayersView {
+  [playerId: string]: IConnectedPlayer;
+}
