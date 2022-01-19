@@ -23,9 +23,6 @@ export class GeckosMessagingHelper {
   ) {
     const playersNearby = this.getPlayersNearby(emitterId);
 
-    console.log("warning close players");
-    console.log(playersNearby);
-
     if (playersNearby) {
       for (const player of playersNearby) {
         this.sendEventToUser(player.channelId, eventName, data);

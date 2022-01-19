@@ -24,6 +24,7 @@ export interface PlayerPositionPayload {
   x: number;
   y: number;
   direction: string;
+  name: string;
 }
 
 export interface IConnectedPlayer {

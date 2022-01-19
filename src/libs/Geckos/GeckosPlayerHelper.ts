@@ -50,6 +50,31 @@ export class GeckosPlayerHelper {
     channel.on(PlayerGeckosEvents.Logout, (d: Data) => {
       const data = d as PlayerLogoutPayload;
 
+      // warn nearby players that the emitter logged out
+
+      const emitterPlayer = GeckosServerHelper.connectedPlayers.find(
+        (player) => player.id === data.id
+      );
+
+      if (!emitterPlayer) {
+        console.log(
+          "Failed to emit logout message to nearby players. Emitter not found."
+        );
+        return;
+      }
+
+      const nearbyPlayers = this.geckosMessagingHelper.getPlayersNearby(
+        emitterPlayer.id
+      );
+
+      for (const player of nearbyPlayers) {
+        this.geckosMessagingHelper.sendEventToUser(
+          player.channelId,
+          PlayerGeckosEvents.Logout,
+          data
+        );
+      }
+
       GeckosServerHelper.connectedPlayers =
         GeckosServerHelper.connectedPlayers.filter(
           (player) => player.id !== data.id
