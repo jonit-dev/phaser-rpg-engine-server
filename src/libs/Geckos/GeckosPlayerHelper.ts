@@ -34,6 +34,8 @@ export class GeckosPlayerHelper {
         x: data.x,
         y: data.y,
         channelId: data.channelId,
+        isMoving: data.isMoving,
+        cameraCoordinates: data.cameraCoordinates,
       });
 
       channel.join(data.channelId); // join channel specific to the user, to we can send direct messages later if we want.
@@ -65,7 +67,7 @@ export class GeckosPlayerHelper {
         return;
       }
 
-      const nearbyPlayers = this.geckosMessagingHelper.getPlayersNearby(
+      const nearbyPlayers = this.geckosMessagingHelper.getPlayersOnCameraView(
         emitterPlayer.id
       );
 
@@ -92,8 +94,6 @@ export class GeckosPlayerHelper {
   public onPlayerUpdatePosition(channel: ServerChannel) {
     channel.on(PlayerGeckosEvents.PositionUpdate, (d: Data) => {
       const data = d as PlayerPositionPayload;
-
-      console.log(data);
 
       // update player position from connectedPlayers
       GeckosServerHelper.connectedPlayers =
@@ -127,11 +127,9 @@ export class GeckosPlayerHelper {
 
       // update the emitter nearby players positions
 
-      const nearbyPlayers = this.geckosMessagingHelper.getPlayersNearby(
+      const nearbyPlayers = this.geckosMessagingHelper.getPlayersOnCameraView(
         data.id
       );
-
-      console.log("nearby", nearbyPlayers);
 
       if (nearbyPlayers) {
         for (const player of nearbyPlayers) {
@@ -139,12 +137,7 @@ export class GeckosPlayerHelper {
             data.channelId,
             PlayerGeckosEvents.PositionUpdate,
             {
-              id: player.id,
-              channelId: player.channelId,
-              x: player.x,
-              y: player.y,
-              direction: player.direction,
-              name: player.name,
+              ...player,
               isMoving: false,
             } as PlayerPositionPayload
           );
@@ -159,7 +152,7 @@ export class GeckosPlayerHelper {
     data: PlayerPositionPayload
   ) {
     const nearbyPlayers =
-      this.geckosMessagingHelper.getPlayersNearby(emitterId);
+      this.geckosMessagingHelper.getPlayersOnCameraView(emitterId);
 
     if (nearbyPlayers.length > 0) {
       for (const player of nearbyPlayers) {

@@ -21,11 +21,20 @@ export interface PlayerLogoutPayload {
 
 export interface PlayerPositionPayload {
   id: string;
+  name: string;
   x: number;
   y: number;
   direction: string;
-  name: string;
   channelId: string;
+  isMoving?: boolean;
+  cameraCoordinates: ICameraCoordinates;
+}
+
+export interface ICameraCoordinates {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
 }
 
 export interface IConnectedPlayer {
@@ -35,6 +44,8 @@ export interface IConnectedPlayer {
   y: number;
   channelId: string;
   direction?: string;
+  isMoving?: boolean;
+  cameraCoordinates: ICameraCoordinates;
 }
 
 export interface IPlayersView {
