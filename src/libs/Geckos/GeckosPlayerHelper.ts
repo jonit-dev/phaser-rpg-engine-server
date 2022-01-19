@@ -4,7 +4,6 @@ import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 import {
   IConnectedPlayer,
-  IPlayersView,
   PlayerGeckosEvents,
   PlayerLogoutPayload,
 } from "../../types/PlayerTypes";
@@ -15,8 +14,6 @@ import { GeckosMessagingHelper } from "./GeckosMessagingHelper";
 export class GeckosPlayerHelper {
   constructor(private geckosMessagingHelper: GeckosMessagingHelper) {}
 
-  public playersView: IPlayersView = {};
-
   public onAddEventListeners(channel: ServerChannel) {
     this.onPlayerCreate(channel);
     this.onPlayerLogout(channel);
@@ -24,7 +21,7 @@ export class GeckosPlayerHelper {
   }
 
   public onPlayerCreate(channel: ServerChannel) {
-    channel.on(PlayerGeckosEvents.Create, (d: Data) => {
+    channel.on(PlayerGeckosEvents.PlayerCreate, (d: Data) => {
       const data = d as IConnectedPlayer;
 
       console.log(`💡: Player ${data.name} has connected!`);
@@ -43,7 +40,7 @@ export class GeckosPlayerHelper {
   }
 
   public onPlayerLogout(channel: ServerChannel) {
-    channel.on(PlayerGeckosEvents.Logout, (d: Data) => {
+    channel.on(PlayerGeckosEvents.PlayerLogout, (d: Data) => {
       const data = d as PlayerLogoutPayload;
 
       // warn nearby players that the emitter logged out
@@ -66,7 +63,7 @@ export class GeckosPlayerHelper {
       for (const player of nearbyPlayers) {
         this.geckosMessagingHelper.sendEventToUser<PlayerLogoutPayload>(
           player.channelId,
-          PlayerGeckosEvents.Logout,
+          PlayerGeckosEvents.PlayerLogout,
           data
         );
       }
@@ -84,7 +81,7 @@ export class GeckosPlayerHelper {
   }
 
   public onPlayerUpdatePosition(channel: ServerChannel) {
-    channel.on(PlayerGeckosEvents.PositionUpdate, (d: Data) => {
+    channel.on(PlayerGeckosEvents.PlayerPositionUpdate, (d: Data) => {
       const data = d as IConnectedPlayer;
 
       // update emitter position from connectedPlayers
@@ -120,7 +117,7 @@ export class GeckosPlayerHelper {
 
             this.geckosMessagingHelper.sendMessageToClosePlayers<IConnectedPlayer>(
               data.id,
-              PlayerGeckosEvents.PositionUpdate,
+              PlayerGeckosEvents.PlayerPositionUpdate,
               data
             );
           }
@@ -137,7 +134,7 @@ export class GeckosPlayerHelper {
         for (const player of nearbyPlayers) {
           this.geckosMessagingHelper.sendEventToUser<IConnectedPlayer>(
             data.channelId,
-            PlayerGeckosEvents.PositionUpdate,
+            PlayerGeckosEvents.PlayerPositionUpdate,
             {
               ...player,
               isMoving: false,
@@ -161,7 +158,7 @@ export class GeckosPlayerHelper {
         // tell other player that we exist, so it can create a new instance of us
         this.geckosMessagingHelper.sendEventToUser<IConnectedPlayer>(
           player.channelId,
-          PlayerGeckosEvents.Create,
+          PlayerGeckosEvents.PlayerCreate,
           data
         );
 
@@ -169,7 +166,7 @@ export class GeckosPlayerHelper {
 
         this.geckosMessagingHelper.sendEventToUser<IConnectedPlayer>(
           emitterChannelId,
-          PlayerGeckosEvents.Create,
+          PlayerGeckosEvents.PlayerCreate,
           player
         );
       }

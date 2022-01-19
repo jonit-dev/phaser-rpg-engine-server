@@ -1,10 +1,9 @@
 //@ts-ignore
 export enum PlayerGeckosEvents {
-  Create = "Create",
-  PositionUpdate = "PositionUpdate",
-  CoordinateSync = "CoordinateSync",
-  Logout = "Logout",
-  PrivateMessage = "PrivateMessage",
+  PlayerCreate = "PlayerCreate",
+  PlayerPositionUpdate = "PlayerPositionUpdate",
+  PlayerLogout = "PlayerLogout",
+  PlayerPrivateMessage = "PlayerPrivateMessage",
 }
 
 export interface IConnectedPlayer {
