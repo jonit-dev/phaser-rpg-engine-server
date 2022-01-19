@@ -12,18 +12,18 @@ import { MathHelper } from "../MathHelper";
 export class GeckosMessagingHelper {
   constructor(private mathHelper: MathHelper) {}
 
-  public sendEventToUser(userChannel: string, eventName: string, data: any) {
+  public sendEventToUser<T>(userChannel: string, eventName: string, data: T) {
     GeckosServerHelper.io.room(userChannel).emit(eventName, data);
   }
 
-  public sendEventToAllUsers(eventName: string, data: any) {
+  public sendEventToAllUsers<T>(eventName: string, data: T) {
     GeckosServerHelper.io.emit(eventName, data);
   }
 
-  public sendMessageToClosePlayers(
+  public sendMessageToClosePlayers<T>(
     emitterId: any,
     eventName: string,
-    data: any
+    data: T
   ) {
     const playersNearby = this.getPlayersOnCameraView(emitterId);
 

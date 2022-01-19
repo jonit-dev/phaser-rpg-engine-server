@@ -1,11 +1,12 @@
 //@ts-ignore
 import { Data, ServerChannel } from "@geckos.io/server";
 import { provide } from "inversify-binding-decorators";
+import _ from "lodash";
 import {
+  IConnectedPlayer,
   IPlayersView,
   PlayerGeckosEvents,
   PlayerLogoutPayload,
-  PlayerPositionPayload,
 } from "../../types/PlayerTypes";
 import { GeckosServerHelper } from "../GeckosServerHelper";
 import { GeckosMessagingHelper } from "./GeckosMessagingHelper";
@@ -24,23 +25,14 @@ export class GeckosPlayerHelper {
 
   public onPlayerCreate(channel: ServerChannel) {
     channel.on(PlayerGeckosEvents.Create, (d: Data) => {
-      const data = d as PlayerPositionPayload;
+      const data = d as IConnectedPlayer;
 
       console.log(`💡: Player ${data.name} has connected!`);
       console.log(data);
-      GeckosServerHelper.connectedPlayers.push({
-        id: data.id,
-        name: data.name,
-        x: data.x,
-        y: data.y,
-        channelId: data.channelId,
-        isMoving: data.isMoving,
-        cameraCoordinates: data.cameraCoordinates,
-      });
+      GeckosServerHelper.connectedPlayers.push(data);
 
-      channel.join(data.channelId); // join channel specific to the user, to we can send direct messages later if we want.
+      channel.join(data.channelId); // join channel specific to the user, to we can send direct  later if we want.
 
-      // channel.join(data.channelId);
       console.log(
         "- Total players connected:",
         GeckosServerHelper.connectedPlayers.length
@@ -72,7 +64,7 @@ export class GeckosPlayerHelper {
       );
 
       for (const player of nearbyPlayers) {
-        this.geckosMessagingHelper.sendEventToUser(
+        this.geckosMessagingHelper.sendEventToUser<PlayerLogoutPayload>(
           player.channelId,
           PlayerGeckosEvents.Logout,
           data
@@ -93,7 +85,7 @@ export class GeckosPlayerHelper {
 
   public onPlayerUpdatePosition(channel: ServerChannel) {
     channel.on(PlayerGeckosEvents.PositionUpdate, (d: Data) => {
-      const data = d as PlayerPositionPayload;
+      const data = d as IConnectedPlayer;
 
       // update emitter position from connectedPlayers
       GeckosServerHelper.connectedPlayers =
@@ -114,12 +106,19 @@ export class GeckosPlayerHelper {
                 player.x = data.x + 1;
               }
             }
-            player.direction = data.direction;
-            player.cameraCoordinates = data.cameraCoordinates;
 
-            console.log(JSON.stringify(data));
+            // here we're removing x and y because we already updated it above with new values and we don't want to overwrite them!
 
-            this.geckosMessagingHelper.sendMessageToClosePlayers(
+            const updateData = _.omit(data, ["x", "y"]);
+
+            player = {
+              ...player,
+              ...updateData,
+            };
+
+            console.log(JSON.stringify(player));
+
+            this.geckosMessagingHelper.sendMessageToClosePlayers<IConnectedPlayer>(
               data.id,
               PlayerGeckosEvents.PositionUpdate,
               data
@@ -136,13 +135,13 @@ export class GeckosPlayerHelper {
 
       if (nearbyPlayers) {
         for (const player of nearbyPlayers) {
-          this.geckosMessagingHelper.sendEventToUser(
+          this.geckosMessagingHelper.sendEventToUser<IConnectedPlayer>(
             data.channelId,
             PlayerGeckosEvents.PositionUpdate,
             {
               ...player,
               isMoving: false,
-            } as PlayerPositionPayload
+            }
           );
         }
       }
@@ -152,7 +151,7 @@ export class GeckosPlayerHelper {
   public sendCreationMessageToPlayers(
     emitterChannelId: string,
     emitterId: string,
-    data: PlayerPositionPayload
+    data: IConnectedPlayer
   ) {
     const nearbyPlayers =
       this.geckosMessagingHelper.getPlayersOnCameraView(emitterId);
@@ -160,20 +159,18 @@ export class GeckosPlayerHelper {
     if (nearbyPlayers.length > 0) {
       for (const player of nearbyPlayers) {
         // tell other player that we exist, so it can create a new instance of us
-        this.geckosMessagingHelper.sendEventToUser(
+        this.geckosMessagingHelper.sendEventToUser<IConnectedPlayer>(
           player.channelId,
           PlayerGeckosEvents.Create,
           data
         );
 
-        // tell the emitter player that this other player exist too :)
+        // tell the emitter about these other players too
 
-        this.geckosMessagingHelper.sendEventToUser(
+        this.geckosMessagingHelper.sendEventToUser<IConnectedPlayer>(
           emitterChannelId,
           PlayerGeckosEvents.Create,
-          {
-            ...player,
-          } as PlayerPositionPayload
+          player
         );
       }
     }
