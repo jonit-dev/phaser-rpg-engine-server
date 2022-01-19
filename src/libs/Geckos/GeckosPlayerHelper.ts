@@ -95,6 +95,8 @@ export class GeckosPlayerHelper {
     channel.on(PlayerGeckosEvents.PositionUpdate, (d: Data) => {
       const data = d as PlayerPositionPayload;
 
+      console.log(JSON.stringify(data));
+
       // update player position from connectedPlayers
       GeckosServerHelper.connectedPlayers =
         GeckosServerHelper.connectedPlayers.map((player) => {
