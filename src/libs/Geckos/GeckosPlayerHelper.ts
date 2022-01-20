@@ -2,6 +2,7 @@
 import { Data, ServerChannel } from "@geckos.io/server";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
+import { GRID_HEIGHT, GRID_WIDTH } from "../../constants/worldConstants";
 import {
   IConnectedPlayer,
   PlayerGeckosEvents,
@@ -91,16 +92,16 @@ export class GeckosPlayerHelper {
             // we have this adjustments because the client sends the initial x, y, not the actual final x, y after the player stops on the grid
             if (player.id === data.id) {
               if (data.direction === "up") {
-                player.y = data.y - 1;
+                player.y = data.y - GRID_HEIGHT;
               }
               if (data.direction === "down") {
-                player.y = data.y + 1;
+                player.y = data.y + GRID_HEIGHT;
               }
               if (data.direction === "left") {
-                player.x = data.x - 1;
+                player.x = data.x - GRID_WIDTH;
               }
               if (data.direction === "right") {
-                player.x = data.x + 1;
+                player.x = data.x + GRID_WIDTH;
               }
             }
 
@@ -152,6 +153,9 @@ export class GeckosPlayerHelper {
   ) {
     const nearbyPlayers =
       this.geckosMessagingHelper.getPlayersOnCameraView(emitterId);
+
+    console.log("warning nearby players...");
+    console.log(nearbyPlayers);
 
     if (nearbyPlayers.length > 0) {
       for (const player of nearbyPlayers) {

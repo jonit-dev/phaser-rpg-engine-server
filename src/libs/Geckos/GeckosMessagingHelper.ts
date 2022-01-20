@@ -53,15 +53,21 @@ export class GeckosMessagingHelper {
         continue; // avoid sending to self
       }
 
+      // console.log(
+      //   `Verifying player ${player.name}, X: ${player.x} Y: ${
+      //     player.y
+      //   } on camera ${JSON.stringify(emitterPlayer.cameraCoordinates)}`
+      // );
+
       if (
         this.isUnderPlayerCamera(
-          player.x * 32, // we have to multiply because emitter x,y is on grid format
-          player.y * 32,
+          player.x, // we have to multiply because emitter x,y is on grid format
+          player.y,
           emitterPlayer.cameraCoordinates
         ) ||
         this.isUnderPlayerCamera(
-          emitterPlayer.x * 32,
-          emitterPlayer.y * 32,
+          emitterPlayer.x,
+          emitterPlayer.y,
           player.cameraCoordinates
         )
       ) {
@@ -70,16 +76,13 @@ export class GeckosMessagingHelper {
     }
 
     //! Debug code
-    // if (playersUnderRange.length > 0) {
-    //   console.log(
-    //     `Players under range of ${emitterPlayer.name}: ${playersUnderRange.map(
-    //       (player) =>
-    //         `${player.name} | X: ${player.x * GRID_WIDTH} | Y: ${
-    //           player.y * GRID_HEIGHT
-    //         }`
-    //     )}`
-    //   );
-    // }
+    if (playersUnderRange.length > 0) {
+      console.log(
+        `Players under range of ${emitterPlayer.name}: ${playersUnderRange.map(
+          (player) => `${player.name} | X: ${player.x} | Y: ${player.y}`
+        )}`
+      );
+    }
 
     return playersUnderRange;
   }
@@ -94,8 +97,8 @@ export class GeckosMessagingHelper {
       {
         top: camera.y,
         left: camera.x,
-        bottom: camera.height,
-        right: camera.width,
+        bottom: camera.height + camera.y,
+        right: camera.width + camera.x,
       }
     );
   }
