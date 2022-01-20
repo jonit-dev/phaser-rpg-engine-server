@@ -114,33 +114,41 @@ export class GeckosPlayerHelper {
               ...updateData,
             };
 
-            console.log(JSON.stringify(player));
-
-            this.geckosMessagingHelper.sendMessageToClosePlayers<IConnectedPlayer>(
-              data.id,
-              PlayerGeckosEvents.PlayerPositionUpdate,
-              data
+            console.log(
+              `📨 Received ${PlayerGeckosEvents.PlayerPositionUpdate}(${
+                player.name
+              }): ${JSON.stringify(player)}`
             );
           }
           return player;
         });
 
-      // update the emitter nearby players positions
+      // warn nearby players that the emitter moved
+      console.log("warning nearby players about emitter position update");
+      this.geckosMessagingHelper.sendMessageToClosePlayers<IConnectedPlayer>(
+        data.id,
+        PlayerGeckosEvents.PlayerPositionUpdate,
+        data
+      );
 
+      // update the emitter nearby players positions
       const nearbyPlayers = this.geckosMessagingHelper.getPlayersOnCameraView(
         data.id
       );
+      console.log("warning emitter about nearby players positions");
 
       if (nearbyPlayers) {
         for (const player of nearbyPlayers) {
-          this.geckosMessagingHelper.sendEventToUser<IConnectedPlayer>(
-            data.channelId,
-            PlayerGeckosEvents.PlayerPositionUpdate,
-            {
-              ...player,
-              isMoving: false,
-            }
-          );
+          if (player.id !== data.id) {
+            this.geckosMessagingHelper.sendEventToUser<IConnectedPlayer>(
+              data.channelId,
+              PlayerGeckosEvents.PlayerPositionUpdate,
+              {
+                ...player,
+                isMoving: false,
+              }
+            );
+          }
         }
       }
     });
