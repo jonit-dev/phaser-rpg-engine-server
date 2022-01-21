@@ -3,8 +3,8 @@ import express from "express";
 import { Container } from "inversify";
 import { buildProviderModule } from "inversify-binding-decorators";
 import "reflect-metadata";
-import { GeckosServerHelper } from "./libs/GeckosServerHelper";
-import { serverRouter } from "./resources/server/server.routes";
+import { GeckosServerHelper } from "./providers/geckos/GeckosServerHelper";
+import { serverRouter } from "./useCases/ModuleSystem/server/read/server.routes";
 
 const app = express();
 

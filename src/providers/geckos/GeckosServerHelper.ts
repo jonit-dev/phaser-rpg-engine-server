@@ -2,8 +2,8 @@
 import { GeckosServer } from "@geckos.io/server";
 import { Server } from "http";
 import { provide } from "inversify-binding-decorators";
-import { IConnectedPlayer } from "../types/PlayerTypes";
-import { GeckosPlayerHelper } from "./Geckos/GeckosPlayerHelper";
+import { IConnectedPlayer } from "../../types/PlayerTypes";
+import { GeckosPlayerHelper } from "../player/GeckosPlayerHelper";
 
 @provide(GeckosServerHelper)
 export class GeckosServerHelper {

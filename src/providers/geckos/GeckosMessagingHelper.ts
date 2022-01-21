@@ -2,8 +2,8 @@
 import { provide } from "inversify-binding-decorators";
 import { CAMERA_VIEWPORT_WIDTH, GRID_WIDTH } from "../../constants/worldConstants";
 import { ICameraCoordinates, IConnectedPlayer } from "../../types/PlayerTypes";
-import { GeckosServerHelper } from "../GeckosServerHelper";
-import { MathHelper } from "../MathHelper";
+import { MathHelper } from "../math/MathHelper";
+import { GeckosServerHelper } from "./GeckosServerHelper";
 
 @provide(GeckosMessagingHelper)
 export class GeckosMessagingHelper {

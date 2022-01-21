@@ -4,8 +4,8 @@ import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 import { GRID_HEIGHT, GRID_WIDTH } from "../../constants/worldConstants";
 import { IConnectedPlayer, PlayerGeckosEvents, PlayerLogoutPayload } from "../../types/PlayerTypes";
-import { GeckosServerHelper } from "../GeckosServerHelper";
-import { GeckosMessagingHelper } from "./GeckosMessagingHelper";
+import { GeckosMessagingHelper } from "../geckos/GeckosMessagingHelper";
+import { GeckosServerHelper } from "../geckos/GeckosServerHelper";
 
 @provide(GeckosPlayerHelper)
 export class GeckosPlayerHelper {
