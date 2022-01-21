@@ -15,6 +15,7 @@ export interface IConnectedPlayer {
   direction?: string;
   isMoving?: boolean;
   cameraCoordinates: ICameraCoordinates;
+  otherPlayersInView?: IConnectedPlayer[];
 }
 
 export interface PlayerLogoutPayload {

@@ -5,7 +5,9 @@
   "license": "MIT",
   "scripts": {
     "dev": "yarn install && ts-node-dev --ignore-watch ./node_modules --transpile-only --respawn -r dotenv/config ./src/server.ts",
-    "build": "tsc -p ."
+    "build": "tsc -p .",
+    "format": "prettier --write . --loglevel silent",
+    "check-formatting": "prettier --check 'src/**/*.ts'"
   },
   "devDependencies": {
     "@types/cors": "^2.8.12",

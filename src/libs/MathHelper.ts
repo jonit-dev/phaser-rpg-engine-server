@@ -14,12 +14,7 @@ interface Rect {
 
 @provide(MathHelper)
 export class MathHelper {
-  public getDistanceBetweenPoints(
-    x1: number,
-    y1: number,
-    x2: number,
-    y2: number
-  ) {
+  public getDistanceBetweenPoints(x1: number, y1: number, x2: number, y2: number) {
     let y = x2 - x1;
     let x = y2 - y1;
 
@@ -27,11 +22,6 @@ export class MathHelper {
   }
 
   public isXYInsideRectangle(point: Point, rect: Rect): boolean {
-    return (
-      point.x > rect.left &&
-      point.x < rect.right &&
-      point.y > rect.top &&
-      point.y < rect.bottom
-    );
+    return point.x > rect.left && point.x < rect.right && point.y > rect.top && point.y < rect.bottom;
   }
 }

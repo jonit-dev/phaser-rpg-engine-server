@@ -1,9 +1,6 @@
 //@ts-ignore
 import { provide } from "inversify-binding-decorators";
-import {
-  CAMERA_VIEWPORT_WIDTH,
-  GRID_WIDTH,
-} from "../../constants/worldConstants";
+import { CAMERA_VIEWPORT_WIDTH, GRID_WIDTH } from "../../constants/worldConstants";
 import { ICameraCoordinates, IConnectedPlayer } from "../../types/PlayerTypes";
 import { GeckosServerHelper } from "../GeckosServerHelper";
 import { MathHelper } from "../MathHelper";
@@ -20,11 +17,7 @@ export class GeckosMessagingHelper {
     GeckosServerHelper.io.emit(eventName, data);
   }
 
-  public sendMessageToClosePlayers<T>(
-    emitterId: any,
-    eventName: string,
-    data: T
-  ) {
+  public sendMessageToClosePlayers<T>(emitterId: any, eventName: string, data: T) {
     const playersNearby = this.getPlayersOnCameraView(emitterId);
 
     if (playersNearby) {
@@ -37,9 +30,7 @@ export class GeckosMessagingHelper {
   public getPlayersOnCameraView(emitterId: string): IConnectedPlayer[] {
     const otherPlayers = GeckosServerHelper.connectedPlayers;
 
-    const emitterPlayer = otherPlayers.find(
-      (player) => player.id === emitterId
-    );
+    const emitterPlayer = otherPlayers.find((player) => player.id === emitterId);
 
     if (!emitterPlayer) {
       console.log("Error: emitter player not found to calculate distance");
@@ -59,11 +50,7 @@ export class GeckosMessagingHelper {
           player.y,
           emitterPlayer.cameraCoordinates
         ) ||
-        this.isUnderPlayerCamera(
-          emitterPlayer.x,
-          emitterPlayer.y,
-          player.cameraCoordinates
-        )
+        this.isUnderPlayerCamera(emitterPlayer.x, emitterPlayer.y, player.cameraCoordinates)
       ) {
         playersUnderRange.push(player);
       }
@@ -72,11 +59,7 @@ export class GeckosMessagingHelper {
     return playersUnderRange;
   }
 
-  private isUnderPlayerCamera(
-    x: number,
-    y: number,
-    camera: ICameraCoordinates
-  ): boolean {
+  private isUnderPlayerCamera(x: number, y: number, camera: ICameraCoordinates): boolean {
     return this.mathHelper.isXYInsideRectangle(
       { x: x, y: y },
       {
@@ -88,19 +71,9 @@ export class GeckosMessagingHelper {
     );
   }
 
-  private isUnderPlayerRange(
-    emitterX: number,
-    emitterY: number,
-    otherX: number,
-    otherY: number
-  ): boolean {
+  private isUnderPlayerRange(emitterX: number, emitterY: number, otherX: number, otherY: number): boolean {
     // compare current position with emitter player position
-    const distance = this.mathHelper.getDistanceBetweenPoints(
-      emitterX,
-      emitterY,
-      otherX,
-      otherY
-    );
+    const distance = this.mathHelper.getDistanceBetweenPoints(emitterX, emitterY, otherX, otherY);
 
     const distanceThreshold = Math.floor(CAMERA_VIEWPORT_WIDTH / GRID_WIDTH);
 
