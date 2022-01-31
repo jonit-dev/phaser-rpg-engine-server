@@ -134,16 +134,12 @@ export class GeckosPlayerHelper {
             player.x = data.x + GRID_WIDTH;
           }
         }
-
         // here we're removing x and y because we already updated it above with new values and we don't want to overwrite them!
-
         const updateData = _.omit(data, ["x", "y"]);
-
         player = {
           ...player,
           ...updateData,
         };
-
         console.log(
           `📨 Received ${PlayerGeckosEvents.PlayerPositionUpdate}(${player.name}): ${JSON.stringify(player)}`
         );
